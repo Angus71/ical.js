@@ -60,6 +60,18 @@
       dt[name].tz = p.TZID
     }
 
+    if (name == 'start') {
+    	if (dt.rrule !== undefined) {
+    		var rrule = require('rrule').RRule;
+    		var options = rrule.parseString(dt.rrule.toString());
+            // If no DTSTART was given with RRULE use current DTSTART
+            if (options.dtstart === undefined) {
+              options.dtstart = dt[name];
+              dt.rrule = new rrule(options);
+            }
+    	}
+    }
+    
     return dt
   }
 
@@ -81,7 +93,6 @@
             parseInt(comps[2], 10)-1,
             comps[3]
           );
-
           return addTZ(curr, name, params);
         }
       }

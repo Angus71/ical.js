@@ -20,13 +20,12 @@ exports.parseFile = function(filename){
 var rrule = require('rrule').RRule
 
 ical.objectHandlers['RRULE'] = function(val, params, curr, stack, line){
-  curr['rrule'] = rrule.fromString(line.replace("RRULE:", ""));
-
-  // If rrule does not contain a start date
-  // read the start date from the current event
-  if (line.indexOf('DTSTART') != -1) {
-    curr['rrule'].options.dtstart = curr.start;    
+  var options = rrule.parseString(line.replace("RRULE:", ""));
+  // If not DTSTART was given with RRULE and DTSTART already set, use it
+  if (options.dtstart === undefined && curr.start !== undefined) {
+	  options.dtstart = curr.start;
   }
+  curr['rrule'] = new rrule(options);
 
   return curr
 }
